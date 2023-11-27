@@ -65,7 +65,6 @@ ___
 
 1. #### Указываем путь до исполняемого файла который определен в `CmakeLists.txt`
 
-
 ![cmake_example](screenshots/cmake_example.png)
 ![route_source_file](screenshots/route_source_file.png)
 
@@ -73,6 +72,6 @@ ___
 
 ![shell_config](screenshots/shell_config.png)
 
-2. #### Запускаем
+3. #### Запускаем
 
 ![run_config](screenshots/run_config.png)

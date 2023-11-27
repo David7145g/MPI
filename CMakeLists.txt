@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(MPI REQUIRED)
 
-add_executable(lab1 1/lab_1.cpp)
+add_executable(lab1 1/lab_1.cpp 3/lab_3.cpp)
 add_executable(lab2 2/lab_2.cpp)
 
 target_link_libraries(lab1 PRIVATE MPI::MPI_CXX)

@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     //кол-во процессов
     int N = std::stoi(argv[2]);
 
-    star(M, N);
+    star(N, M);
 
     return 0;
 }
