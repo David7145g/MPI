@@ -1,6 +1,10 @@
 #include <iostream>
 #include <mpi.h>
 
+/**
+ * @param N - Кол-во процессов
+ * @param M - Кол-во итераций
+ */
 void star(int N, int M) {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -13,31 +17,30 @@ void star(int N, int M) {
     }
 
     for (int i = 0; i < M; i++) {
-        // Создать случайное сообщение
+        // Создать случайное сообщение только на процессе с рангом 0
         int message;
         if (rank == 0) {
             message = rand() % 100;
             std::cout << "Центральный процесс отправляет сообщение: " << message << std::endl;
         }
 
-        // Распространить сообщение от процесса с рангом 0 всем остальным процессам
-        MPI_Bcast(&message, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        // Распределить сообщение от процесса с рангом 0 на все остальные процессы
+        MPI_Scatter(&message, 1, MPI_INT, &message, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         // Получить сообщение от центрального процесса
-        std::cout << "процесс " << rank << " получает сообщение от центрального процесса: " << message << std::endl;
+        std::cout << "Процесс " << rank << " получает сообщение от центрального процесса: " << message << std::endl;
 
         // Генерировать случайный ответ
         int response = rand() % 100;
 
-        // Отправить ответ обратно в центральный процесс
+        // Собрать ответы от всех процессов на центральный процесс
+        MPI_Gather(&response, 1, MPI_INT, &response, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        // Вывести ответы на центральном процессе
         if (rank == 0) {
-            // Получить ответы от всех остальных процессов
             for (int j = 1; j <= N; j++) {
-                MPI_Recv(&response, 1, MPI_INT, j, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                 std::cout << "Центральный процесс получает ответ от процесса " << j << ": " << response << std::endl;
             }
-        } else {
-            MPI_Send(&response, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         }
     }
 

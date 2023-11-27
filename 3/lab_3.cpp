@@ -1,48 +1,50 @@
 #include <iostream>
 #include <mpi.h>
 
+/**
+ * @param N - Кол-во процессов
+ * @param M - Кол-во итераций
+ */
 void star(int N, int M) {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    if (size < N+1) {
-        if (rank == 0) {
-            printf("Ошибка: количество процессов должно быть не меньше N+1\n");
-        }
+    if (size < N + 1) {
+        if (rank == 0) printf("Ошибка: количество процессов должно быть не меньше N+1\n");
         MPI_Finalize();
         exit(1);
     }
 
-    int central_rank = 0;
-    int message = 0;
-    int* recv_buffer = new int[N]; // Буфер для приема сообщений
-
     for (int i = 0; i < M; i++) {
-        if (rank == central_rank) {
-            // Генерируем сообщение для отправки
-            int* send_buffer = new int[N];
-            for (int j = 0; j < N; j++) {
-                send_buffer[j] = message;
+        // Создать случайное сообщение
+        int message;
+        if (rank == 0) {
+            message = rand() % 100;
+            std::cout << "Центральный процесс отправляет сообщение: " << message << std::endl;
+        }
+
+        // Распространить сообщение от процесса с рангом 0 всем остальным процессам
+        MPI_Bcast(&message, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        // Получить сообщение от центрального процесса
+        std::cout << "процесс " << rank << " получает сообщение от центрального процесса: " << message << std::endl;
+
+        // Генерировать случайный ответ
+        int response = rand() % 100;
+
+        // Отправить ответ обратно в центральный процесс
+        if (rank == 0) {
+            // Получить ответы от всех остальных процессов
+            for (int j = 1; j <= N; j++) {
+                MPI_Recv(&response, 1, MPI_INT, j, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                std::cout << "Центральный процесс получает ответ от процесса " << j << ": " << response << std::endl;
             }
-            // Отправляем сообщение всем остальным процессам
-            MPI_Scatter(send_buffer, 1, MPI_INT, MPI_IN_PLACE, 1, MPI_INT, central_rank, MPI_COMM_WORLD);
-            printf("Процесс %d отправил сообщение \n", rank);
-
-            delete[] send_buffer;
+        } else {
+            MPI_Send(&response, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         }
-        else if (rank <= N) {
-            // Процессы-крайние принимают сообщения от центрального процесса
-            MPI_Scatter(nullptr, 1, MPI_INT, &recv_buffer[rank - 1], 1, MPI_INT, central_rank, MPI_COMM_WORLD);
-            printf("Процесс %d принял сообщение от центрального процесса\n", rank);
-        }
-
-        MPI_Barrier(MPI_COMM_WORLD);
     }
 
-    delete[] recv_buffer;
-
-    printf("Процесс %d завершил свою работу\n", rank);
     MPI_Finalize();
 }
 
