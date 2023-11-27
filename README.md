@@ -57,7 +57,7 @@ mpiexec -n 5 ./program_name 3 2
 
 ___ 
 
-1. #### Указываем путь до исполняемого файла который определен в `CmakeLists.txt`
+1. #### Узнаем путь до исполняемого файла который определен в `CmakeLists.txt`
 
 ![cmake_example](screenshots/cmake_example.png)
 ![route_source_file](screenshots/route_source_file.png)
