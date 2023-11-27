@@ -10,8 +10,6 @@
 
 ## Установка OpenMPI в CLion на linux:
 
-___
-
 ### Установите OpenMPI в систему:
 
 ```shell
@@ -33,8 +31,6 @@ target_link_libraries(Name_Project PRIVATE MPI::MPI_CXX)
 ```
 
 ## Запуск программы через терминал:
-
-___
 
 ### На примере 1-ой лабораторной работы
 
